@@ -56,8 +56,7 @@ def ask_adrien(question: str):
         return f"Erreur API : {e}"
 
 # 🔹 Interface Streamlit
-st.set_page_config(page_title="Assistant Adrien", page_icon="🤖")
-st.title("Assistant-personnel d'Adrien (proxy Mistral)")
+st.set_page_config(page_title="ia Adrien", page_icon="🤖")
 
 question = st.text_input("Pose une question sur Adrien :")
 
