@@ -1,6 +1,7 @@
 # app.py
 import streamlit as st
 import requests
+import time
 
 # 🔑 Clé API et URL
 API_KEY = "JR14hHchfiwyVYB9T8TsscwWk4o75gJh"
@@ -30,8 +31,8 @@ Caractéristiques d'Adrien :
   "favorite_food": "sushi",
   "city": "Aubagne",
   "near_city": "Marseille",
-  "brother_and_sister": 3_sisters",
-  "sisters_names": juillette(9 anos) louise(25 anos) mathilde(29 anos (née le meme jour que Adrien))",
+  "brother_and_sister": "3 sisters",
+  "sisters_names": "Juliette (9 ans), Louise (25 ans), Mathilde (29 ans, née le même jour qu’Adrien)"
 }
 """
 
@@ -57,8 +58,7 @@ def ask_adrien(question: str):
         {"role": "user", "content": question}
     ]
     try:
-        answer = mistral_request(messages)
-        return answer
+        return mistral_request(messages)
     except Exception as e:
         return f"Erreur API : {e}"
 
@@ -69,14 +69,13 @@ def translate_to_french(text: str):
         {"role": "user", "content": text}
     ]
     try:
-        translation = mistral_request(messages)
-        return translation
+        return mistral_request(messages)
     except Exception as e:
         return f"Erreur de traduction : {e}"
 
 # 🎨 Interface Streamlit
 st.set_page_config(page_title="IA Adrien", page_icon="🤖")
-st.title("")
+st.title("Assistant personnel d’Adrien 🤖")
 
 question = st.text_input("Pose une question sur Adrien :")
 
@@ -84,10 +83,17 @@ if st.button("Envoyer"):
     if question:
         with st.spinner("Réflexion en cours..."):
             answer = ask_adrien(question)
-            translation = translate_to_french(answer)
         st.markdown("### 🇪🇸 Réponse en espagnol :")
         st.write(answer)
-        st.markdown("### 🇫🇷 Traduction en français :")
-        st.write(translation)
+
+        # Bouton pour afficher la traduction
+        show_translation = st.button("💬 Afficher la traduction en français")
+        if show_translation:
+            with st.spinner("Traduction en cours..."):
+                time.sleep(0.8)  # petit effet d’attente réaliste
+                translation = translate_to_french(answer)
+            st.markdown("### 🇫🇷 Traduction en français :")
+            st.write(translation)
+
     else:
         st.warning("Veuillez entrer une question.")
