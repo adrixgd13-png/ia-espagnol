@@ -77,23 +77,36 @@ def translate_to_french(text: str):
 st.set_page_config(page_title="IA Adrien", page_icon="🤖")
 st.title("Assistant personnel d’Adrien 🤖")
 
+# Initialisation des variables de session
+if "answer" not in st.session_state:
+    st.session_state.answer = None
+if "translation" not in st.session_state:
+    st.session_state.translation = None
+
 question = st.text_input("Pose une question sur Adrien :")
 
 if st.button("Envoyer"):
     if question:
         with st.spinner("Réflexion en cours..."):
             answer = ask_adrien(question)
-        st.markdown("### 🇪🇸 Réponse en espagnol :")
-        st.write(answer)
-
-        # Bouton pour afficher la traduction
-        show_translation = st.button("💬 Afficher la traduction en français")
-        if show_translation:
-            with st.spinner("Traduction en cours..."):
-                time.sleep(0.8)  # petit effet d’attente réaliste
-                translation = translate_to_french(answer)
-            st.markdown("### 🇫🇷 Traduction en français :")
-            st.write(translation)
-
+        st.session_state.answer = answer
+        st.session_state.translation = None  # reset la trad
     else:
         st.warning("Veuillez entrer une question.")
+
+# ✅ Affichage de la réponse espagnole si dispo
+if st.session_state.answer:
+    st.markdown("### 🇪🇸 Réponse en espagnol :")
+    st.write(st.session_state.answer)
+
+    # Bouton pour afficher la traduction
+    if st.session_state.translation is None:
+        if st.button("💬 Afficher la traduction en français"):
+            with st.spinner("Traduction en cours..."):
+                time.sleep(0.8)
+                st.session_state.translation = translate_to_french(st.session_state.answer)
+
+    # ✅ Afficher la traduction si elle existe déjà
+    if st.session_state.translation:
+        st.markdown("### 🇫🇷 Traduction en français :")
+        st.write(st.session_state.translation)
