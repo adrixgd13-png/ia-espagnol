@@ -1,7 +1,7 @@
 # app.py
 import streamlit as st
 import requests
-from googletrans import Translator
+from deep_translator import GoogleTranslator
 import time
 
 # 🔑 Clé API et URL
@@ -106,4 +106,5 @@ if st.button("Envoyer"):
         st.markdown(f"### 🇫🇷 Traduction :\n{trad_fr}")
     else:
         st.warning("Veuillez entrer une question.")
+
 
