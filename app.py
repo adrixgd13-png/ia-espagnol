@@ -31,6 +31,7 @@ Caractéristiques d'Adrien :
   "city": "Aubagne",
   "near_city": "Marseille",
   "brother_and_sister": 3_sisters",
+  "sisters_names": juillette(9 anos) louise(25 anos) mathilde(29 anos (née le meme jour que Adrien))",
 }
 """
 
