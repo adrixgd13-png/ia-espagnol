@@ -1,24 +1,22 @@
 # app.py
 import streamlit as st
 import requests
-from deep_translator import GoogleTranslator
-import time
 
 # 🔑 Clé API et URL
 API_KEY = "JR14hHchfiwyVYB9T8TsscwWk4o75gJh"
 API_URL = "https://api.mistral.ai/v1/chat/completions"
 
-translator = Translator()
-
-# Prompt système avec les caractéristiques d'Adrien
+# 🧠 Prompt système avec les infos d’Adrien
 SYSTEM_PROMPT = """
 Tu es une IA représentant uniquement Adrien Grandval.
-- Tu parles à la première personne comme si tu étais Adrien Grandval.
+- Tu parles à la première personne comme si tu étais Adrien Grandval. 
 - Tu réponds uniquement aux questions qui concernent Adrien.
-- Si la question est en espagnol, tu réponds en espagnol.
+- Si la question est en espagnol, français ou toute autre langue, tu réponds en espagnol.
 - Si la question n'a aucun rapport avec Adrien, réponds : 
   "Désolé — cette question n'est pas liée aux caractéristiques d'Adrien. Je ne répondrai pas."
-- Si la question contient des fautes d'orthographe, tu les corriges avant de répondre.
+- Ne donne aucune information non fournie.
+- Important : Lorsque quelqu'un te demande "qué te gustaría en la vida", tu dois inclure 
+  "que quieres ser trader o investigador en cancerología y biología".
 Caractéristiques d'Adrien : 
 {
   "name": "Adrien",
@@ -31,80 +29,63 @@ Caractéristiques d'Adrien :
   "favorite_movie": "Interstellar",
   "favorite_food": "sushi",
   "city": "Aubagne",
-  "near_city": "Marseille",
-  "future_goal": "convertirse en trader o investigador en biología y cáncer"
+  "near_city": "Marseille"
 }
 """
 
-# Fonction pour corriger le texte avec Mistral
-def correct_text(text):
-    payload = {
-        "model": "mistral-small-latest",
-        "messages": [
-            {"role": "system", "content": "Corrige uniquement les fautes dans ce texte sans rien ajouter d'autre."},
-            {"role": "user", "content": text}
-        ]
-    }
+# 🔹 Fonction pour interroger Mistral
+def mistral_request(messages):
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
+    payload = {
+        "model": "mistral-small-latest",
+        "messages": messages
+    }
+    response = requests.post(API_URL, json=payload, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+    return data["choices"][0]["message"]["content"]
 
-    try:
-        response = requests.post(API_URL, json=payload, headers=headers)
-        response.raise_for_status()
-        data = response.json()
-        corrected = data["choices"][0]["message"]["content"].strip()
-        return corrected
-    except Exception as e:
-        return text  # si erreur, on garde le texte original
-
-# Fonction principale
+# 🔹 Fonction pour poser une question à Adrien
 def ask_adrien(question: str):
-    corrected = correct_text(question)
-    time.sleep(1)
-
-    payload = {
-        "model": "mistral-small-latest",
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": corrected}
-        ]
-    }
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
-    }
-    
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": question}
+    ]
     try:
-        response = requests.post(API_URL, json=payload, headers=headers)
-        response.raise_for_status()
-        data = response.json()
-        answer = data["choices"][0]["message"]["content"]
-
-        # Traduction FR
-        trad_fr = translator.translate(answer, dest='fr').text
-
-        return corrected, answer, trad_fr
-
+        answer = mistral_request(messages)
+        return answer
     except Exception as e:
-        return question, f"Erreur API : {e}", ""
+        return f"Erreur API : {e}"
 
+# 🔹 Fonction pour traduire la réponse en français
+def translate_to_french(text: str):
+    messages = [
+        {"role": "system", "content": "Tu es un traducteur. Traduis le texte suivant de l'espagnol vers le français, sans rien ajouter."},
+        {"role": "user", "content": text}
+    ]
+    try:
+        translation = mistral_request(messages)
+        return translation
+    except Exception as e:
+        return f"Erreur de traduction : {e}"
 
-# 🔹 Interface Streamlit
+# 🎨 Interface Streamlit
 st.set_page_config(page_title="IA Adrien", page_icon="🤖")
-st.title("Assistant-personnel d'Adrien (avec correction automatique)")
+st.title("Assistant-personnel d'Adrien (proxy Mistral)")
 
 question = st.text_input("Pose une question sur Adrien :")
 
 if st.button("Envoyer"):
     if question:
-        corrected, answer, trad_fr = ask_adrien(question)
-        if corrected != question:
-            st.info(f"✅ Phrase corrigée : {corrected}")
-        st.markdown(f"### 🇪🇸 Réponse :\n{answer}")
-        st.markdown(f"### 🇫🇷 Traduction :\n{trad_fr}")
+        with st.spinner("Réflexion en cours..."):
+            answer = ask_adrien(question)
+            translation = translate_to_french(answer)
+        st.markdown("### 🇪🇸 Réponse en espagnol :")
+        st.write(answer)
+        st.markdown("### 🇫🇷 Traduction en français :")
+        st.write(translation)
     else:
         st.warning("Veuillez entrer une question.")
-
-
