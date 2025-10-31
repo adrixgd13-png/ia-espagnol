@@ -75,7 +75,7 @@ def translate_to_french(text: str):
 
 # 🎨 Interface Streamlit
 st.set_page_config(page_title="IA Adrien", page_icon="🤖")
-st.title("Assistant-personnel d'Adrien (proxy Mistral)")
+st.title("")
 
 question = st.text_input("Pose une question sur Adrien :")
 
