@@ -106,3 +106,4 @@ if st.button("Envoyer"):
         st.markdown(f"### 🇫🇷 Traduction :\n{trad_fr}")
     else:
         st.warning("Veuillez entrer une question.")
+
