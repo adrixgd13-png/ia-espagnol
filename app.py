@@ -6,15 +6,17 @@ import requests
 API_KEY = "JR14hHchfiwyVYB9T8TsscwWk4o75gJh"
 API_URL = "https://api.mistral.ai/v1/chat/completions"
 
-# Prompt système avec les caractéristiques d'Adrien
+# 🧠 Prompt système avec les infos d’Adrien
 SYSTEM_PROMPT = """
 Tu es une IA représentant uniquement Adrien Grandval.
--tu parles à la première personne comme si tu étais Adrien Grandval. 
--Tu réponds uniquement aux questions qui concernent Adrien.
-- Si la question est en espagnol ou français ou toute autre langue, tu réponds en espagnol.
+- Tu parles à la première personne comme si tu étais Adrien Grandval. 
+- Tu réponds uniquement aux questions qui concernent Adrien.
+- Si la question est en espagnol, français ou toute autre langue, tu réponds en espagnol.
 - Si la question n'a aucun rapport avec Adrien, réponds : 
   "Désolé — cette question n'est pas liée aux caractéristiques d'Adrien. Je ne répondrai pas."
 - Ne donne aucune information non fournie.
+- Important : Lorsque quelqu'un te demande "qué te gustaría en la vida", tu dois inclure 
+  "que quieres ser trader o investigador en cancerología y biología".
 Caractéristiques d'Adrien : 
 {
   "name": "Adrien",
@@ -31,38 +33,59 @@ Caractéristiques d'Adrien :
 }
 """
 
-
-# Fonction pour interroger Mistral
-def ask_adrien(question: str):
-    payload = {
-        "model": "mistral-small-latest",
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": question}
-        ]
-    }
+# 🔹 Fonction pour interroger Mistral
+def mistral_request(messages):
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json"
     }
-    
+    payload = {
+        "model": "mistral-small-latest",
+        "messages": messages
+    }
+    response = requests.post(API_URL, json=payload, headers=headers)
+    response.raise_for_status()
+    data = response.json()
+    return data["choices"][0]["message"]["content"]
+
+# 🔹 Fonction pour poser une question à Adrien
+def ask_adrien(question: str):
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": question}
+    ]
     try:
-        response = requests.post(API_URL, json=payload, headers=headers)
-        response.raise_for_status()
-        data = response.json()
-        answer = data["choices"][0]["message"]["content"]
+        answer = mistral_request(messages)
         return answer
     except Exception as e:
         return f"Erreur API : {e}"
 
-# 🔹 Interface Streamlit
-st.set_page_config(page_title="ia Adrien", page_icon="🤖")
+# 🔹 Fonction pour traduire la réponse en français
+def translate_to_french(text: str):
+    messages = [
+        {"role": "system", "content": "Tu es un traducteur. Traduis le texte suivant de l'espagnol vers le français, sans rien ajouter."},
+        {"role": "user", "content": text}
+    ]
+    try:
+        translation = mistral_request(messages)
+        return translation
+    except Exception as e:
+        return f"Erreur de traduction : {e}"
+
+# 🎨 Interface Streamlit
+st.set_page_config(page_title="IA Adrien", page_icon="🤖")
+st.title("Assistant-personnel d'Adrien (proxy Mistral)")
 
 question = st.text_input("Pose une question sur Adrien :")
 
 if st.button("Envoyer"):
     if question:
-        answer = ask_adrien(question)
-        st.markdown(f"**Réponse :** {answer}")
+        with st.spinner("Réflexion en cours..."):
+            answer = ask_adrien(question)
+            translation = translate_to_french(answer)
+        st.markdown("### 🇪🇸 Réponse en espagnol :")
+        st.write(answer)
+        st.markdown("### 🇫🇷 Traduction en français :")
+        st.write(translation)
     else:
         st.warning("Veuillez entrer une question.")
