@@ -29,7 +29,8 @@ Caractéristiques d'Adrien :
   "favorite_movie": "Interstellar",
   "favorite_food": "sushi",
   "city": "Aubagne",
-  "near_city": "Marseille"
+  "near_city": "Marseille",
+  "brother_and_sister": 3_sisters",
 }
 """
 
@@ -74,7 +75,7 @@ def translate_to_french(text: str):
 
 # 🎨 Interface Streamlit
 st.set_page_config(page_title="IA Adrien", page_icon="🤖")
-st.title("")
+st.title("Assistant-personnel d'Adrien (proxy Mistral)")
 
 question = st.text_input("Pose une question sur Adrien :")
 
@@ -89,4 +90,3 @@ if st.button("Envoyer"):
         st.write(translation)
     else:
         st.warning("Veuillez entrer une question.")
-
