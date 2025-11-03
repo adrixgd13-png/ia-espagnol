@@ -74,8 +74,8 @@ def translate_to_french(text: str):
         return f"Erreur de traduction : {e}"
 
 # 🎨 Interface Streamlit
-st.set_page_config(page_title="IA Adrien", page_icon="🤖")
-st.title("Assistant personnel d’Adrien 🤖")
+st.set_page_config(page_title="IA Espagnol", page_icon="🤖")
+st.title("mi presentation original :")
 
 # Initialisation des variables de session
 if "answer" not in st.session_state:
@@ -110,4 +110,5 @@ if st.session_state.answer:
     if st.session_state.translation:
         st.markdown("### 🇫🇷 Traduction en français :")
         st.write(st.session_state.translation)
+
 
