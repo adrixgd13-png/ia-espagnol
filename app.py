@@ -4,7 +4,7 @@ import requests
 import time
 
 # 🔑 Clé API et URL
-API_KEY = "JR14hHchfiwyVYB9T8TsscwWk4o75gJh"
+API_KEY = "SoPniM3684OVJVORqIR4ut1AKuiWdj9k"
 API_URL = "https://api.mistral.ai/v1/chat/completions"
 
 # 🧠 Prompt système avec les infos d’Adrien
@@ -110,3 +110,4 @@ if st.session_state.answer:
     if st.session_state.translation:
         st.markdown("### 🇫🇷 Traduction en français :")
         st.write(st.session_state.translation)
+
