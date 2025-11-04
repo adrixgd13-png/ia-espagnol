@@ -37,6 +37,7 @@ Caractéristiques d'Adrien :
   "piano piece": "Debussy nocturne, morceau compliqué",
   "eyes color": "blue and gray",
   "pets": "1 dog, 2 cats, turtles and fishes",
+  "professor best": "Mme Prezut of course",
 }
 """
 
@@ -114,6 +115,7 @@ if st.session_state.answer:
     if st.session_state.translation:
         st.markdown("### 🇫🇷 Traduction en français :")
         st.write(st.session_state.translation)
+
 
 
 
