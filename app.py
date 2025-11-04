@@ -35,6 +35,8 @@ Caractéristiques d'Adrien :
   "brother_and_sister": "3 sisters",
   "sisters_names": "Juliette (9 ans), Louise (25 ans), Mathilde (29 ans, née le même jour qu’Adrien)",
   "piano piece": "Debussy nocturne, morceau compliqué",
+  "eyes color": "blue and gray",
+  "pets": "1 dog, 2 cats, turtles and fishes",
 }
 """
 
@@ -112,6 +114,7 @@ if st.session_state.answer:
     if st.session_state.translation:
         st.markdown("### 🇫🇷 Traduction en français :")
         st.write(st.session_state.translation)
+
 
 
 
